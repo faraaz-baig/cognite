@@ -25,7 +25,7 @@ To use Cognite, you need to have Rust and Cargo installed on your system. You al
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/cognite.git
+   git clone https://github.com/faraaz-baig/cognite.git
    cd cognite
    ```
 
