@@ -1,82 +1,78 @@
 # Cognite: High-Performance ML Framework in Rust
 
-Cognite is a high-performance machine learning framework implemented in Rust, designed to leverage GPU acceleration for optimal performance. This project is currently in its early stages of development.
+Cognite is a high-performance machine learning framework implemented in Rust, designed to leverage GPU acceleration for efficient computation. It aims to provide a fast and memory-efficient alternative to existing ML frameworks.
 
 ## Features
 
 - GPU-accelerated vector operations using OpenCL
 - Efficient memory management with a custom memory pool
-- Flexible tensor operations (work in progress)
-- Designed for high performance and memory efficiency
+- Use of `Arc<T>` for O(1) cloning of tensors and GPU buffers
+- Lazy initialization of global resources
+- Singleton pattern for consistent memory pool access
 
 ## Current Status
 
-This project is in active development. Current implemented features include:
+The project is in its early stages. Currently implemented features include:
 
 - Basic tensor structure
 - GPU-accelerated vector addition
-- Memory pooling for efficient GPU memory management
+- Memory pool for efficient GPU buffer management
+- Singleton pattern for global resource management
 
-Many more features are planned and under development.
+## Dependencies
 
-## Installation
+- Rust (latest stable version)
+- OpenCL
+- ocl = "0.19"
+- lazy_static = "1.4.0"
+- ndarray = "0.15"
+- num-traits = "0.2"
 
-To use Cognite, you need to have Rust and Cargo installed on your system. You also need OpenCL drivers installed for your GPU.
+## Setup
 
-1. Clone the repository:
+1. Ensure you have Rust and OpenCL installed on your system.
+2. Clone this repository:
    ```
    git clone https://github.com/yourusername/cognite.git
    cd cognite
    ```
-
-2. Build the project:
+3. Build the project:
    ```
-   cargo build --release
+   cargo build
    ```
 
 ## Usage
 
-Here's a basic example of how to use Cognite for vector addition:
+Currently, the framework provides a GPU-accelerated vector addition operation. Here's a basic example of how to use it:
 
 ```rust
-use cognite::tensor::Tensor;
-use cognite::ops::add_vectors;
+use cognite::gpu::add_vectors_gpu;
 
 fn main() {
-    let a = Tensor::new(vec![1.0, 2.0, 3.0], false);
-    let b = Tensor::new(vec![4.0, 5.0, 6.0], false);
+    let a = vec![1.0, 2.0, 3.0, 4.0, 5.0];
+    let b = vec![5.0, 4.0, 3.0, 2.0, 1.0];
     
-    let result = add_vectors(&a, &b);
-    
-    println!("Result: {:?}", result);
+    match add_vectors_gpu(&a, &b) {
+        Ok(result) => println!("Result: {:?}", result),
+        Err(e) => eprintln!("Error: {}", e),
+    }
 }
 ```
+
+The `MEMORY_POOL` is automatically initialized and managed, so you don't need to worry about it in your code.
+
+## Future Plans
+
+- Implement more GPU-accelerated operations (subtraction, multiplication, etc.)
+- Add support for matrix operations
+- Implement basic machine learning algorithms (linear regression, logistic regression, etc.)
+- Optimize memory usage and computation speed
+- Add comprehensive test suite and benchmarks
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## Future Plans
-
-- Implement more GPU-accelerated operations (multiplication, convolution, etc.)
-- Add support for neural network layers
-- Implement automatic differentiation
-- Optimize performance further
-- Add comprehensive documentation and examples
-
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- This project uses the `ocl` crate for OpenCL integration.
-- Inspired by other ML frameworks like TensorFlow and PyTorch.
-
-## Contact
-
-If you have any questions or feedback, please open an issue on the GitHub repository.
-
----
-
-Note: This framework is in early development and is not yet suitable for production use. APIs may change significantly as the project evolves.
+This project is licensed under the MIT License - see the LICENSE file for details.

@@ -1,19 +1,25 @@
-use ndarray::{Array, IxDyn};
-use num_traits::Num;
+use ndarray::{Array, ArrayD, IxDyn};
+use num_traits::Float;
+use std::sync::Arc;
 
-#[derive(Clone, Debug)]
-pub struct Tensor<T: Num> {
-    pub data: Array<T, IxDyn>,
+#[derive(Clone)]
+pub struct Tensor<T: Float> {
+    pub data: Arc<ArrayD<T>>,
     pub requires_grad: bool,
-    // We'll add more fields later for autograd
 }
 
-impl<T: Num> Tensor<T> {
-    pub fn new(data: Array<T, IxDyn>, requires_grad: bool) -> Self {
+impl<T: Float> Tensor<T> {
+    pub fn new(data: ArrayD<T>, requires_grad: bool) -> Self {
         Self {
-            data,
+            data: Arc::new(data),
             requires_grad,
         }
+    }
+
+    pub fn from_vec(data: Vec<T>, shape: &[usize], requires_grad: bool) -> Self {
+        let array = Array::from_shape_vec(IxDyn(shape), data)
+            .expect("Shape mismatch");
+        Self::new(array, requires_grad)
     }
 
     pub fn shape(&self) -> Vec<usize> {
@@ -23,6 +29,4 @@ impl<T: Num> Tensor<T> {
     pub fn ndim(&self) -> usize {
         self.data.ndim()
     }
-
-    // More methods will be added here
 }

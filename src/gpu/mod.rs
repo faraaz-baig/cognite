@@ -1,11 +1,11 @@
 mod memory_pool;
 
 use ocl::ProQue;
-use std::error::Error;
 use std::sync::Arc;
-use self::memory_pool::MemoryPool;
+pub use self::memory_pool::MemoryPool;
+use lazy_static::lazy_static;
 
-lazy_static::lazy_static! {
+lazy_static! {
     static ref PRO_QUE: Arc<ProQue> = Arc::new(ProQue::builder()
         .src(r#"
             __kernel void add(__global const float* a, __global const float* b, __global float* c) {
@@ -13,14 +13,13 @@ lazy_static::lazy_static! {
                 c[gid] = a[gid] + b[gid];
             }
         "#)
-        .dims(1)
         .build()
         .expect("Failed to build ProQue"));
 
-    static ref MEMORY_POOL: MemoryPool = MemoryPool::new(PRO_QUE.clone());
+    pub static ref MEMORY_POOL: MemoryPool = MemoryPool::new(PRO_QUE.clone());
 }
 
-pub fn add_vectors_gpu(a: &[f32], b: &[f32]) -> Result<Vec<f32>, Box<dyn Error>> {
+pub fn add_vectors_gpu(a: &[f32], b: &[f32]) -> Result<Vec<f32>, ocl::Error> {
     let n = a.len();
     
     let buffer_a = MEMORY_POOL.get_buffer(n)?;
@@ -31,9 +30,9 @@ pub fn add_vectors_gpu(a: &[f32], b: &[f32]) -> Result<Vec<f32>, Box<dyn Error>>
     buffer_b.write(b).enq()?;
 
     let kernel = PRO_QUE.kernel_builder("add")
-        .arg(&buffer_a)
-        .arg(&buffer_b)
-        .arg(&buffer_c)
+        .arg(&*buffer_a)
+        .arg(&*buffer_b)
+        .arg(&*buffer_c)
         .global_work_size(n)
         .build()?;
 
