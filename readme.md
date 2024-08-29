@@ -33,7 +33,7 @@ The project is in its early stages. Currently implemented features include:
 1. Ensure you have Rust and OpenCL installed on your system.
 2. Clone this repository:
    ```
-   git clone https://github.com/yourusername/cognite.git
+   git clone https://github.com/faraaz-baig/cognite.git
    cd cognite
    ```
 3. Build the project:
